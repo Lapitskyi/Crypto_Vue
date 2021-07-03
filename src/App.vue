@@ -2,21 +2,15 @@
   <div class="container">
     <section>
       <form v-on:submit.prevent class="form">
-        <label class="form__label" for="formInput">
-          <input
-            v-model="value"
-            @keydown.enter="addCrypto"
-            class="form__input"
-            type="text"
-            name="formInput"
-            id="formInput"
-            placeholder="Crypto name"
-          />
-        </label>
-        <button @click="addCrypto" type="button" class="form__btn">
-          <img src="" alt="" />
+        <my-input
+          v-model="value"
+          class="form__input"
+          placeholder="Crypto name"
+          @keydown.enter="addCrypto"
+        />
+        <my-button @click="addCrypto" type="button" class="form__btn">
           Добавить
-        </button>
+        </my-button>
       </form>
     </section>
 
@@ -65,8 +59,11 @@
 </template>
 <script>
 // import sprite from "./assets/svgSprite/svgSprite.svg"
+import MyInput from "./components/UI/MyInput";
+import MyButton from './components/UI/MyButton';
 export default {
   name: "App",
+  components: { MyButton, MyInput },
   data() {
     return {
       value: "",
@@ -127,53 +124,40 @@ export default {
 </script>
 <style lang="scss">
 @import "./assets/scss/null.scss";
-
 .container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 10px;
 }
-
 section + section {
   margin: 20px 0;
   padding: 20px 0;
 }
-
 .form {
   &__label {
   }
-
   &__input {
     padding: 10px;
     border: 1px solid #718096;
     border-radius: 8px;
   }
-
   &__btn {
     margin-left: 5px;
-    background-color: #718096;
-    color: #fff;
-    padding: 10px;
-    border-radius: 8px;
   }
 }
-
 .active {
   border-color: green !important;
 }
-
 .crypto {
   &__list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     grid-template-rows: minmax(170px, auto);
     grid-gap: 10px;
-
     list-style: none;
     margin: 0;
     padding: 0;
   }
-
   &__list-item {
     display: flex;
     flex-direction: column;
@@ -183,7 +167,6 @@ section + section {
     border: 4px solid #a0aec0;
     border-radius: 8px;
   }
-
   &__list-box {
     width: 100%;
     height: 100%;
@@ -193,19 +176,16 @@ section + section {
     justify-content: space-between;
     padding: 20px;
   }
-
   &__list-title {
     font-size: 14px;
     color: #a0aec0;
     text-align: center;
     text-transform: uppercase;
   }
-
   &__list-price {
     font-size: 30px;
     color: #000000;
   }
-
   &__list-btn {
     display: inline-block;
     text-decoration: none;
@@ -221,12 +201,10 @@ section + section {
     color: #ffffff;
     padding: 20px;
     position: relative;
-
     &:focus {
       outline: none;
     }
   }
-
   &__list-icon {
     position: absolute;
     width: 20px;
@@ -244,7 +222,6 @@ section + section {
     font-size: 16px;
     text-transform: uppercase;
   }
-
   &__item {
     width: 10px;
     border: 1px solid purple;
