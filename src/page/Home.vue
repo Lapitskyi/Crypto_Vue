@@ -33,6 +33,7 @@ import MyInput from "@/components/UI/MyInput";
 import MyButton from "@/components/UI/MyButton";
 import CryptoList from "../components/CryptoList";
 import Graph from "../components/Graph";
+import { subscribeToTicker } from "../service/Api";
 
 export default {
   name: "Home",
@@ -47,23 +48,6 @@ export default {
   },
   created() {},
   methods: {
-    requestCrypto(currentCrypto) {
-      setInterval(async () => {
-        const f = await fetch(
-          `https://min-api.cryptocompare.com/data/price?fsym=${currentCrypto.name}&tsyms=USD&api_Key=process.env.VUE_APP__API_KEY`
-        );
-        const data = await f.json();
-        this.cryptoArray.find((itemTicker) => {
-          if (itemTicker.name === currentCrypto.name) {
-            itemTicker.price =
-              data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
-          }
-          if (this.sel?.name === currentCrypto.name) {
-            this.graph.push(data.USD);
-          }
-        });
-      }, 5000);
-    },
     addCrypto() {
       if (this.ticker !== "") {
         const currentCrypto = {
@@ -71,9 +55,28 @@ export default {
           name: this.ticker,
           price: "-",
         };
-        this.requestCrypto(currentCrypto);
+        setInterval(async () => {
+          await subscribeToTicker(currentCrypto, (newPrice) =>
+            this.cryptoArray.find((itemTicker) => {
+              if (itemTicker.name === currentCrypto.name) {
+                itemTicker.price =
+                  newPrice.USD > 1
+                    ? newPrice.USD.toFixed(2)
+                    : newPrice.USD.toPrecision(2);
+              }
+              if (this.sel?.name === currentCrypto.name) {
+                this.graph.push(newPrice.USD);
+              }
+            })
+          );
+        }, 5000);
+
         this.cryptoArray.push(currentCrypto);
         this.ticker = "";
+        localStorage.setItem(
+          "cryptonomicon-list",
+          JSON.stringify(this.cryptoArray)
+        );
       }
     },
     deleteCrypto(cryptoId) {
@@ -89,7 +92,15 @@ export default {
       const maxValue = Math.max(...this.graph);
       const minValue = Math.min(...this.graph);
       return this.graph.map(
-        (price) => 5 + ((price - minValue) * 95) / (maxValue - minValue)
+        (price) => 10 + ((price - minValue) * 90) / (maxValue - minValue)
+      );
+    },
+  },
+  watch: {
+    cryptoArray() {
+      localStorage.setItem(
+        "cryptonomicon-list",
+        JSON.stringify(this.cryptoArray)
       );
     },
   },
