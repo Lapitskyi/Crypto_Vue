@@ -26,6 +26,10 @@ export default {
 </script>
 
 <style scoped>
-.input {}
+.input {
+  padding: 10px;
+  border: 1px solid #718096;
+  border-radius: 8px;
+}
 .label {}
 </style>
