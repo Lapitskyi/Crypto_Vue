@@ -33,7 +33,7 @@ import MyInput from "@/components/UI/MyInput";
 import MyButton from "@/components/UI/MyButton";
 import CryptoList from "../components/CryptoList";
 import Graph from "../components/Graph";
-import { subscribeToTicker } from "../service/Api";
+import { requireCryptoAll, subscribeToTicker } from "../service/Api";
 
 export default {
   name: "Home",
@@ -44,9 +44,12 @@ export default {
       cryptoArray: [],
       graph: [],
       sel: null,
+      allTickers: [],
     };
   },
-  created() {},
+  created() {
+    this.getAllTikers();
+  },
   methods: {
     addCrypto() {
       if (this.ticker !== "") {
@@ -94,6 +97,12 @@ export default {
       return this.graph.map(
         (price) => 10 + ((price - minValue) * 90) / (maxValue - minValue)
       );
+    },
+    getAllTikers() {
+      requireCryptoAll((t) => {
+        console.log(t);
+        this.allTickers.push(t.Data);
+      });
     },
   },
   watch: {
