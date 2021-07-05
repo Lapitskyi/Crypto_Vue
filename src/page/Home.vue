@@ -8,10 +8,20 @@
           placeholder="Crypto name"
           @keydown.enter="addCrypto"
         />
+
         <my-button @click="addCrypto" type="button" class="form__btn">
           Добавить
         </my-button>
       </form>
+      <ul class="options__list" v-if="searchCrypto.length">
+        <li
+          v-for="find in searchCrypto.splice(0, 4)"
+          :key="find.id"
+          class="options__list-item"
+        >
+          <span>{{ find.Symbol }}</span>
+        </li>
+      </ul>
     </section>
 
     <section v-if="cryptoArray.length">
@@ -50,6 +60,16 @@ export default {
   created() {
     this.getAllTikers();
   },
+  computed: {
+    searchCrypto() {
+      return [...this.allTickers].filter((item) => {
+        if (this.ticker !== "") {
+          return item.Symbol.toLowerCase().includes(this.ticker.toLowerCase());
+        }
+      });
+    },
+  },
+
   methods: {
     addCrypto() {
       if (this.ticker !== "") {
@@ -100,8 +120,8 @@ export default {
     },
     getAllTikers() {
       requireCryptoAll((t) => {
-        console.log(t);
-        this.allTickers.push(t.Data);
+        const tickersCryptoAll = new Object(Object.values(t));
+        this.allTickers = [...tickersCryptoAll];
       });
     },
   },
@@ -115,4 +135,30 @@ export default {
   },
 };
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+.options {
+  &__list {
+    width: max-content;
+    border-radius: 10px;
+    border: 1px solid #a0aec0;
+    padding: 5px;
+    display: flex;
+  }
+
+  &__list-item + &__list-item {
+    margin-left: 2px;
+  }
+
+  &__list-item {
+    border-radius: 10px;
+    border: 1px solid #a0aec0;
+    padding: 3px 10px;
+
+    span {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #000000;
+    }
+  }
+}
+</style>

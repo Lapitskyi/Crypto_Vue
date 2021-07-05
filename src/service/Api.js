@@ -30,5 +30,5 @@ export const subscribeToTicker = async (currentCrypto, cb) => {
 
 export const requireCryptoAll = async (cb) => {
   const result = await getCryptoAll();
-  cb(result)
+  cb(result.Data);
 };
