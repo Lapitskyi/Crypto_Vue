@@ -131,7 +131,13 @@ export default {
   },
   watch: {
     ticker() {
-      if (this.ticker === "") this.errorTicker = false;
+      this.cryptoArray.forEach((itemCrypto) => {
+        if (
+          itemCrypto.name.toLowerCase().search(this.ticker.toLowerCase()) !== -1
+        ) {
+          this.errorTicker = false;
+        }
+      });
     },
   },
 };
@@ -148,6 +154,7 @@ export default {
     border: 1px solid #a0aec0;
     padding: 5px;
     display: flex;
+    cursor: pointer;
   }
 
   &__list-item + &__list-item {
