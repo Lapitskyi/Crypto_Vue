@@ -13,11 +13,13 @@
           Добавить
         </my-button>
       </form>
+      <span v-if="errorTicker" class="error"> Такой тикер уже есть </span>
       <ul class="options__list" v-if="searchCrypto.length">
         <li
           v-for="find in searchCrypto.splice(0, 4)"
           :key="find.id"
           class="options__list-item"
+          @click="addCrypto((this.ticker = find.Symbol))"
         >
           <span>{{ find.Symbol }}</span>
         </li>
@@ -55,6 +57,7 @@ export default {
       graph: [],
       sel: null,
       allTickers: [],
+      errorTicker: false,
     };
   },
   created() {
@@ -73,33 +76,34 @@ export default {
   methods: {
     addCrypto() {
       if (this.ticker !== "") {
-        const currentCrypto = {
-          id: Date.now(),
-          name: this.ticker,
-          price: "-",
-        };
-        setInterval(async () => {
-          await subscribeToTicker(currentCrypto, (newPrice) =>
-            this.cryptoArray.find((itemTicker) => {
-              if (itemTicker.name === currentCrypto.name) {
-                itemTicker.price =
-                  newPrice.USD > 1
-                    ? newPrice.USD.toFixed(2)
-                    : newPrice.USD.toPrecision(2);
-              }
-              if (this.sel?.name === currentCrypto.name) {
-                this.graph.push(newPrice.USD);
-              }
-            })
-          );
-        }, 5000);
-
-        this.cryptoArray.push(currentCrypto);
-        this.ticker = "";
-        localStorage.setItem(
-          "cryptonomicon-list",
-          JSON.stringify(this.cryptoArray)
+        let currentCrypto = { id: Date.now(), name: this.ticker, price: "-" };
+        this.errorTicker = this.cryptoArray.some(
+          (item) => item.name === currentCrypto.name
         );
+
+        if (!this.errorTicker) {
+          this.cryptoArray = [...this.cryptoArray, currentCrypto];
+          setInterval(async () => {
+            await subscribeToTicker(currentCrypto, (newPrice) =>
+              this.cryptoArray.find((itemTicker) => {
+                if (itemTicker.name === currentCrypto.name) {
+                  itemTicker.price =
+                    newPrice.USD > 1
+                      ? newPrice.USD.toFixed(2)
+                      : newPrice.USD.toPrecision(2);
+                }
+                if (this.sel?.name === currentCrypto.name) {
+                  this.graph.push(newPrice.USD);
+                }
+              })
+            );
+          }, 5000);
+          localStorage.setItem(
+            "cryptonomicon-list",
+            JSON.stringify(this.cryptoArray)
+          );
+        }
+
       }
     },
     deleteCrypto(cryptoId) {
@@ -126,18 +130,19 @@ export default {
     },
   },
   watch: {
-    cryptoArray() {
-      localStorage.setItem(
-        "cryptonomicon-list",
-        JSON.stringify(this.cryptoArray)
-      );
+    ticker() {
+      if (this.ticker === "") this.errorTicker = false;
     },
   },
 };
 </script>
 <style lang="scss">
+.error {
+  color: red;
+}
 .options {
   &__list {
+    margin-top: 10px;
     width: max-content;
     border-radius: 10px;
     border: 1px solid #a0aec0;
